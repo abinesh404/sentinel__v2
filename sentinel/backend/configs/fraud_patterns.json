@@ -1,0 +1,37 @@
+[
+  {
+    "pattern": "journal posted after business hours",
+    "risk": "Potential fraudulent adjustment",
+    "severity": "High",
+    "regex": "(after hours|weekend|holiday)",
+    "target_columns": ["control", "risk", "assessment"]
+  },
+  {
+    "pattern": "duplicate invoice amount",
+    "risk": "Duplicate payment fraud",
+    "severity": "High",
+    "regex": "(duplicate|multiple payments)",
+    "target_columns": ["control", "risk", "gaps"]
+  },
+  {
+    "pattern": "suspicious round number amounts",
+    "risk": "Fabricated accounting entry",
+    "severity": "Medium",
+    "regex": "(round number|exact thousand)",
+    "target_columns": ["control", "risk"]
+  },
+  {
+    "pattern": "backdated transaction",
+    "risk": "Timing manipulation",
+    "severity": "High",
+    "regex": "(backdate|prior period)",
+    "target_columns": ["control", "risk", "assessment"]
+  },
+  {
+    "pattern": "unapproved entry",
+    "risk": "Unauthorized posting",
+    "severity": "High",
+    "regex": "(unapproved|pending approval)",
+    "target_columns": ["control", "risk", "gaps", "assessment"]
+  }
+]

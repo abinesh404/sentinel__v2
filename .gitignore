@@ -1,0 +1,48 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+web_drivers/
+.venv/
+venv/
+ENV/
+env/
+
+# Production/Build outputs
+dist/
+build/
+out/
+.next/
+
+# IDE/Editor folders
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Python caches/compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.toast
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local env files
+.env
+.env.local
+.env.*.local

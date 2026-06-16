@@ -1,0 +1,62 @@
+[
+  {
+    "control_type": "MANUAL",
+    "frequency": "DAILY",
+    "risk_score": 80,
+    "priority": "High"
+  },
+  {
+    "control_type": "MANUAL",
+    "frequency": "CONTINUOUS",
+    "risk_score": 85,
+    "priority": "High"
+  },
+  {
+    "control_type": "MANUAL",
+    "frequency": "WEEKLY",
+    "risk_score": 65,
+    "priority": "Medium"
+  },
+  {
+    "control_type": "MANUAL",
+    "frequency": "MONTHLY",
+    "risk_score": 50,
+    "priority": "Medium"
+  },
+  {
+    "control_type": "SEMI-AUTOMATED",
+    "frequency": "DAILY",
+    "risk_score": 60,
+    "priority": "Medium"
+  },
+  {
+    "control_type": "SEMI-AUTOMATED",
+    "frequency": "WEEKLY",
+    "risk_score": 45,
+    "priority": "Medium"
+  },
+  {
+    "control_type": "SEMI-AUTOMATED",
+    "frequency": "MONTHLY",
+    "risk_score": 35,
+    "priority": "Low"
+  },
+  {
+    "control_type": "AUTOMATED",
+    "frequency": "DAILY",
+    "risk_score": 25,
+    "priority": "Low"
+  },
+  {
+    "control_type": "AUTOMATED",
+    "frequency": "WEEKLY",
+    "risk_score": 20,
+    "priority": "Low"
+  },
+  {
+    "control_type": "AUTOMATED",
+    "frequency": "MONTHLY",
+    "risk_score": 15,
+    "priority": "Low"
+  }
+]

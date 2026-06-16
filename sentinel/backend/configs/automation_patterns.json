@@ -1,0 +1,32 @@
+[
+  {
+    "manual_process": "Invoice approval",
+    "keyword": "invoice",
+    "automation": "ERP workflow routing"
+  },
+  {
+    "manual_process": "Bank reconciliation",
+    "keyword": "reconciliation",
+    "automation": "Automated matching engine"
+  },
+  {
+    "manual_process": "User access review",
+    "keyword": "access",
+    "automation": "Identity and Access Management (IAM) provisioning"
+  },
+  {
+    "manual_process": "Master data update",
+    "keyword": "master data",
+    "automation": "Master Data Management (MDM) integration"
+  },
+  {
+    "manual_process": "Journal entry review",
+    "keyword": "journal",
+    "automation": "System-enforced tolerance limits and automated posting"
+  },
+  {
+    "manual_process": "Purchase order generation",
+    "keyword": "purchase",
+    "automation": "Automated MRP (Material Requirements Planning) generation"
+  }
+]
