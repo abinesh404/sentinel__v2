@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './index.css';
 
-const API = 'http://127.0.0.1:5001/arm';
+const API = 'http://127.0.0.1:4001/arm';
 
 const sc = s => ['Green', 'High'].includes(s) ? 'g' : ['Amber', 'Medium'].includes(s) ? 'a' : s === 'Pending' ? 'p' : 'r';
 const clr = s => ['Green', 'High'].includes(s) ? 'var(--grn)' : ['Amber', 'Medium'].includes(s) ? 'var(--amb)' : s === 'Pending' ? 'var(--dim)' : 'var(--red)';

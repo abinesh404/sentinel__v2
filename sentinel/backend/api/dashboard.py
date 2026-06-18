@@ -136,10 +136,7 @@ def get_strategic_plan():
     except Exception as e:
         print("Error reading reference Audit Plan.xlsx:", e)
 
-    # If df is None or empty, fall back to parsing reference Excel file directly
-    if df is None or df.empty:
-        df = ref_df
-        
+    # Do not automatically fall back to reference Excel if no user file is uploaded.
     if df is None or df.empty:
         return jsonify([])
         
@@ -318,7 +315,7 @@ def get_strategic_plan():
         import urllib.request
         import json
         req_months = urllib.request.Request(
-            "http://127.0.0.1:5001/arm/months",
+            "http://127.0.0.1:4001/arm/months",
             headers={"User-Agent": "Sentinel-Agent"}
         )
         with urllib.request.urlopen(req_months, timeout=2) as response:
@@ -327,7 +324,7 @@ def get_strategic_plan():
         
         latest_month = months_list[-1] if months_list else "2024-09"
         
-        url_readiness = f"http://127.0.0.1:5001/arm/readiness?mode=PRS&month={latest_month}"
+        url_readiness = f"http://127.0.0.1:4001/arm/readiness?mode=PRS&month={latest_month}"
         req_readiness = urllib.request.Request(
             url_readiness,
             headers={"User-Agent": "Sentinel-Agent"}
@@ -714,11 +711,8 @@ def rebuild_context_from_db(tenant_id: str) -> bool:
         return False
 
 def check_and_load_tenant_files(tenant_id):
-    # 1. First check if database already has data and load it
+    # 1. We no longer automatically load database data at starting to use only explicitly uploaded/selected data.
     tenant_mem = data_context_engine._memory.get(tenant_id, {})
-    if tenant_mem.get("df") is None:
-        rebuild_context_from_db(tenant_id)
-        tenant_mem = data_context_engine._memory.get(tenant_id, {})
 
     # 2. Fallback to scanning upload folder for auditors file
     from services.tenant_manager import tenant_manager

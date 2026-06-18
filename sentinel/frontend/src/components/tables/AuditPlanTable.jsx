@@ -23,7 +23,7 @@ const getArmUrl = (procName) => {
   }
   const { protocol, hostname } = window.location;
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return `http://localhost:5173/prs/${encodeURIComponent(procName)}`;
+    return `http://localhost:4003/prs/${encodeURIComponent(procName)}`;
   }
   let origin = window.location.origin;
   if (origin.includes('sentinel')) {
@@ -313,7 +313,7 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
       .then(res => res.json())
       .then(data => {
         if (!data || data.length === 0) {
-          setRows(SAMPLE_RCM_RECORDS);
+          setRows([]);
           return;
         }
         const mapped = data.map((item, idx) => ({
@@ -326,7 +326,7 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
       })
       .catch(err => {
         console.error("Failed to load strategic plan:", err);
-        setRows(SAMPLE_RCM_RECORDS);
+        setRows([]);
       })
       .finally(() => setLoading(false));
   }, [appData.status, appData.filename]);
@@ -611,7 +611,7 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
 
     setIsGenerating(true);
     try {
-      const response = await fetch('http://localhost:5000/api/generate-audit-presentation', {
+      const response = await fetch('http://localhost:4000/api/generate-audit-presentation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -339,5 +339,5 @@ def get_plant_detail(plant_code):
 app.register_blueprint(arm)
 
 if __name__ == '__main__':
-    print("Starting AjaLabs ARM Backend on http://127.0.0.1:5001")
-    app.run(port=5001, debug=True)
+    print("Starting AjaLabs ARM Backend on http://127.0.0.1:4001")
+    app.run(port=4001, debug=True)

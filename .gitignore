@@ -46,3 +46,8 @@ pip-delete-this-directory.txt
 .env
 .env.local
 .env.*.local
+
+# Sentinel local upload and storage folders
+sentinel/backend/uploads/
+sentinel/storage/
+

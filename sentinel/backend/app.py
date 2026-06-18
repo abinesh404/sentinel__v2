@@ -31,9 +31,9 @@ app.register_blueprint(audit_template_bp)
 
 @app.route("/")
 def index():
-    return "<h3>Sentinel Audit AI Backend is running!</h3><p>Please open the frontend application in your browser at: <a href='http://localhost:5173'>http://localhost:5173</a></p>"
+    return "<h3>Sentinel Audit AI Backend is running!</h3><p>Please open the frontend application in your browser at: <a href='http://localhost:4002'>http://localhost:4002</a></p>"
 
 if __name__ == "__main__":
-    print("Sentinel Audit AI - Flask Backend starting on http://localhost:5000")
-    app.run(debug=True, port=5000, host="0.0.0.0")
+    print("Sentinel Audit AI - Flask Backend starting on http://localhost:4000")
+    app.run(debug=True, port=4000, host="0.0.0.0")
 
