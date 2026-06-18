@@ -55,13 +55,16 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
 
   // Bottom-bar global fields for the audit plan
   const getDefaultStartDate = () => {
-    const today = new Date();
-    if (today.getDay() === 0) {
-      today.setDate(today.getDate() + 1);
+    const target = new Date();
+    // Default to the next day
+    target.setDate(target.getDate() + 1);
+    // If the next day is Sunday (0), shift to Monday
+    if (target.getDay() === 0) {
+      target.setDate(target.getDate() + 1);
     }
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const year = target.getFullYear();
+    const month = String(target.getMonth() + 1).padStart(2, '0');
+    const day = String(target.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
 
@@ -121,7 +124,7 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
     plants: [],
     leadAuditor: '',
     auditDescription: '',
-    department: 'Finance',
+    department: '',
   });
 
   const [validationErrors, setValidationErrors] = useState({
@@ -130,7 +133,6 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
     auditors: false,
     auditType: false,
     auditName: false,
-    department: false,
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -1618,16 +1620,16 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
           {/* Department */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={labelStyle}>
-              <Users size={12} /> Department <span style={{ color: '#f87171' }}>*</span>
+              <Users size={12} /> Department
             </label>
             <select
               value={globalFields.department}
               onChange={(e) => {
                 setGlobalFields(prev => ({ ...prev, department: e.target.value }));
-                setValidationErrors(prev => ({ ...prev, department: false }));
               }}
-              style={getDarkFieldStyle(validationErrors.department, { height: '38px', width: '100%', boxSizing: 'border-box' })}
+              style={getDarkFieldStyle(false, { height: '38px', width: '100%', boxSizing: 'border-box' })}
             >
+              <option value="">Select Department</option>
               <option value="Finance">Finance</option>
               <option value="IT">IT</option>
               <option value="Operations">Operations</option>
@@ -1680,9 +1682,6 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
               backgroundColor: '#6366f1',
               boxShadow: '0 0 8px #6366f1',
             }} />
-            <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)', fontWeight: '500' }}>
-              Fields marked with <span style={{ color: '#f87171' }}>*</span> are required to launch.
-            </span>
           </div>
 
           {/* Action Buttons */}
@@ -1731,7 +1730,6 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
                   auditors: uniqueAuditors.length === 0,
                   auditType: !globalFields.auditType,
                   auditName: !globalFields.auditName || !globalFields.auditName.trim(),
-                  department: !globalFields.department,
                 };
                 setValidationErrors(errors);
 

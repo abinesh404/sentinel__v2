@@ -138,21 +138,19 @@ def determine_expected_benefit(type_text, freq_text, proc_text, ctrl_text):
     return "Streamlined exception reporting and monitoring"
 
 def build_ai_suggestions(df=None, col_map=None):
-    """Generate suggestions from Manufacturing_Strategic_RCM_Exact_Rationale.xlsx, ordered exactly by priority list and capped at 15 rows."""
+    """Generate suggestions from ref_suggestions table in PostgreSQL, ordered exactly by priority list and capped at 15 rows."""
     import pandas as pd
-    import os
     import math
     
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-    file_path = os.path.join(base_dir, "backend", "AI Suggestions data", "Manufacturing_Strategic_RCM_Exact_Rationale.xlsx")
-    if not os.path.exists(file_path):
-        return []
-        
     try:
-        # Load the 'Strategic RCM' sheet. Row index 2 in Excel is the headers row.
-        xls_df = pd.read_excel(file_path, sheet_name='Strategic RCM', header=2)
+        from utils.postgres_db import get_connection
+        conn = get_connection()
+        try:
+            xls_df = pd.read_sql("SELECT * FROM ref_suggestions;", conn)
+        finally:
+            conn.close()
     except Exception as e:
-        print("Error reading suggestions Excel:", e)
+        print("Error reading suggestions from database:", e)
         return []
         
     suggestions = []
@@ -169,6 +167,9 @@ def build_ai_suggestions(df=None, col_map=None):
         rationale_raw = row.get('Rationale')
         rationale_text = str(rationale_raw).strip() if pd.notnull(rationale_raw) else ""
         
+        cases_raw = row.get('Cases')
+        cases_text = str(cases_raw).strip() if pd.notnull(cases_raw) else ""
+        
         if not ctrl_text:
             continue
             
@@ -176,7 +177,8 @@ def build_ai_suggestions(df=None, col_map=None):
             "Associated Risk": risk_text,
             "Process": proc_text,
             "Rationale": rationale_text,
-            "Suggested Control": ctrl_text
+            "Suggested Control": ctrl_text,
+            "Cases": cases_text
         })
         
     # Sort based on the exact risk category order

@@ -192,6 +192,7 @@ def create_tables_if_not_exist():
                     "Others" TEXT,
                     "file name" TEXT,
                     "index" TEXT,
+                    "audit_plan" TEXT,
                     "create date" TIMESTAMP DEFAULT NOW(),
                     "updated date" TIMESTAMP DEFAULT NOW()
                 );
@@ -207,7 +208,7 @@ def create_tables_if_not_exist():
                     "Occurance", "Control Activity Frequency", "Control Performed by",
                     "Design Assessment Result", "Gaps Noted (if any)", "Attribute",
                     "Data Request", "Remarks", "Others", "file name", "index",
-                    "create date", "updated date"
+                    "audit_plan", "create date", "updated date"
                 ]
             )
 
@@ -499,9 +500,9 @@ def save_audit_session_data(tenant_id, filename, active_rcm_rows, audit_plan_row
                     """
                     UPDATE input_rcm
                     SET audit_plan = %s
-                    WHERE file_name = %s OR filename = %s
+                    WHERE "file name" = %s
                     """,
-                    (audit_name, filename or "unknown_file", filename or "unknown_file")
+                    (audit_name, filename or "unknown_file")
                 )
 
             # 3. Save allocated audit plan rows to audit_plan
@@ -525,7 +526,7 @@ def save_audit_session_data(tenant_id, filename, active_rcm_rows, audit_plan_row
                 
                 lead_auditor = global_fields.get("leadAuditor") or ""
                 audit_description = global_fields.get("auditDescription") or ""
-                department_val = global_fields.get("department") or "Finance"
+                department_val = global_fields.get("department") or None
 
                 # Build plan values and calculate row count
                 temp_plan_values = []

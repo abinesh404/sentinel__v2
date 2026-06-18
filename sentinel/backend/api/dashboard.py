@@ -36,13 +36,13 @@ def get_data():
     
     if "auditors" not in tenant_mem:
         default_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "AI Suggestions data", "Master data for Auditors.xlsx")
-        if os.path.exists(default_path):
-            try:
-                auditors = parse_auditor_master(default_path)
+        try:
+            auditors = parse_auditor_master(default_path)
+            if auditors:
                 data_context_engine._init_tenant(tenant_id)
                 data_context_engine._memory[tenant_id]["auditors"] = auditors
-            except Exception as e:
-                print("Failed to parse default auditors on get_data:", e)
+        except Exception as e:
+            print("Failed to parse default auditors on get_data:", e)
     
     if tenant_mem.get("df") is None:
         return jsonify({
@@ -121,20 +121,25 @@ def get_strategic_plan():
     import os
     import pandas as pd
     
-    # Load reference controls & risks from Audit Plan.xlsx
+    # Load reference controls & risks from ref_audit_plan table in PostgreSQL
     ref_controls = []
     ref_risks = []
     ref_df = None
-    ref_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "source_data", "Audit Plan.xlsx"))
     try:
-        if os.path.exists(ref_path):
-            ref_df = pd.read_excel(ref_path)
+        from utils.postgres_db import get_connection
+        conn = get_connection()
+        try:
+            ref_df = pd.read_sql("SELECT * FROM ref_audit_plan;", conn)
+        finally:
+            conn.close()
+
+        if ref_df is not None and not ref_df.empty:
             if "control_description" in ref_df.columns:
                 ref_controls = [str(x).strip().lower() for x in ref_df["control_description"].dropna().tolist()]
             if "Risk description" in ref_df.columns:
                 ref_risks = [str(x).strip().lower() for x in ref_df["Risk description"].dropna().tolist()]
     except Exception as e:
-        print("Error reading reference Audit Plan.xlsx:", e)
+        print("Error reading ref_audit_plan table:", e)
 
     # Do not automatically fall back to reference Excel if no user file is uploaded.
     if df is None or df.empty:
@@ -462,12 +467,21 @@ def parse_auditor_master(file_path):
     
     # Try dynamic path based on workspace location first, then fallback to file_path
     default_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "AI Suggestions data", "Master data for Auditors.xlsx")
-    if os.path.exists(default_path):
-        target_path = default_path
+    
+    # Read from database if requesting default/deleted local file, otherwise read the provided file
+    if file_path == default_path or not os.path.exists(file_path):
+        try:
+            from utils.postgres_db import get_connection
+            conn = get_connection()
+            try:
+                df = pd.read_sql("SELECT * FROM ref_auditors;", conn)
+            finally:
+                conn.close()
+        except Exception as e:
+            print("Error reading ref_auditors table:", e)
+            df = pd.DataFrame()
     else:
-        target_path = file_path
-        
-    df = pd.read_excel(target_path)
+        df = pd.read_excel(file_path)
     
     # Always take the 2nd column (index 1) for the auditor name
     if len(df.columns) > 1:
@@ -795,15 +809,15 @@ def get_auditors():
     
     if "auditors" not in tenant_mem:
         default_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "AI Suggestions data", "Master data for Auditors.xlsx")
-        if os.path.exists(default_path):
-            try:
-                auditors = parse_auditor_master(default_path)
+        try:
+            auditors = parse_auditor_master(default_path)
+            if auditors:
                 data_context_engine._init_tenant(tenant_id)
                 data_context_engine._memory[tenant_id]["auditors"] = auditors
-            except Exception as e:
-                return jsonify({"error": f"Failed to parse default auditors: {str(e)}"}), 500
-        else:
-            return jsonify([])
+            else:
+                return jsonify([])
+        except Exception as e:
+            return jsonify({"error": f"Failed to parse default auditors: {str(e)}"}), 500
             
     return jsonify(data_context_engine._memory[tenant_id].get("auditors", []))
 
@@ -826,13 +840,13 @@ def get_status_tracker():
     auditors = tenant_mem.get("auditors", [])
     if not auditors:
         default_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "AI Suggestions data", "Master data for Auditors.xlsx")
-        if os.path.exists(default_path):
-            try:
-                auditors = parse_auditor_master(default_path)
+        try:
+            auditors = parse_auditor_master(default_path)
+            if auditors:
                 data_context_engine._init_tenant(tenant_id)
                 data_context_engine._memory[tenant_id]["auditors"] = auditors
-            except Exception as e:
-                print("Failed to load fallback auditors for status tracker:", e)
+        except Exception as e:
+            print("Failed to load fallback auditors for status tracker:", e)
                 
     # Map columns to extract details
     process_col = "process" if "process" in df.columns else df.columns[0]
@@ -1026,19 +1040,20 @@ def get_gap_analysis_benchmarks():
         }
     }
     
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".."))
-    BENCHMARK_FILE = os.path.join(base_dir, "source_data", "Risk Analytics (3).xlsx")
-    if not os.path.exists(BENCHMARK_FILE):
-        return jsonify({"error": "Benchmark file not found", "leftChart": [], "rightChart": []}), 404
-        
     try:
+        from utils.postgres_db import get_connection
         import pandas as pd
-        xls = pd.ExcelFile(BENCHMARK_FILE)
+        conn = get_connection()
+        try:
+            df_global = pd.read_sql("SELECT * FROM ref_global_risk;", conn)
+            df_ind = pd.read_sql("SELECT * FROM ref_industry_risk;", conn)
+            df_fraud = pd.read_sql("SELECT * FROM ref_industry_fraud;", conn)
+        finally:
+            conn.close()
         
         # 1. Left Chart: Top Risks Analysis
         left_data = []
         if scope == "global" or not scope:
-            df_global = pd.read_excel(xls, "Global Risk")
             col = "Global Average"
             if col in df_global.columns:
                 for idx, row in df_global.iterrows():
@@ -1047,7 +1062,6 @@ def get_gap_analysis_benchmarks():
                     if pd.notnull(val) and risk_area:
                         left_data.append({"name": risk_area, "value": round(float(val) * 100, 1)})
         elif scope == "regional":
-            df_global = pd.read_excel(xls, "Global Risk")
             col = region
             if col in df_global.columns:
                 for idx, row in df_global.iterrows():
@@ -1056,7 +1070,6 @@ def get_gap_analysis_benchmarks():
                     if pd.notnull(val) and risk_area:
                         left_data.append({"name": risk_area, "value": round(float(val) * 100, 1)})
         elif scope == "industry":
-            df_ind = pd.read_excel(xls, "Industry Wise Risk")
             mapping = INDUSTRY_MAPPING.get(industry, {})
             col = mapping.get("risk_col", "Manufacturing")
             if col in df_ind.columns:
@@ -1070,9 +1083,7 @@ def get_gap_analysis_benchmarks():
         
         # 2. Right Chart: Top Fraud Schemes
         right_data = []
-        df_fraud = pd.read_excel(xls, "Indusrty Wise Fraud Schemes", skiprows=2)
-        mapping = INDUSTRY_MAPPING.get(industry, {})
-        row_industry_name = mapping.get("fraud_row", "Manufacturing")
+        row_industry_name = mapping.get("fraud_row", "Manufacturing") if 'mapping' in locals() else "Manufacturing"
         
         # Find matching row in Industry column
         fraud_row = df_fraud[df_fraud["Industry"].fillna("").astype(str).str.strip().str.lower() == row_industry_name.lower()]
@@ -1134,12 +1145,15 @@ def post_to_production():
 
 @dashboard_bp.route("/api/plants", methods=["GET"])
 def get_plants():
-    plant_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "source_data", "Plant.xlsx"))
-    if not os.path.exists(plant_path):
-        return jsonify([])
     try:
+        from utils.postgres_db import get_connection
         import pandas as pd
-        df = pd.read_excel(plant_path)
+        conn = get_connection()
+        try:
+            df = pd.read_sql("SELECT * FROM ref_plant;", conn)
+        finally:
+            conn.close()
+
         if df.empty:
             return jsonify([])
         first_col = df.columns[0]
@@ -1151,7 +1165,7 @@ def get_plants():
             plants.append({"code": code, "name": f"{code} - {name}"})
         return jsonify(plants)
     except Exception as e:
-        print("Error reading Plant.xlsx:", e)
+        print("Error reading ref_plant table:", e)
         return jsonify([])
 
 
