@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request, Blueprint
 from flask_cors import CORS
 import pandas as pd
 import numpy as np
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 import os
 import random
 import urllib.parse
@@ -12,8 +12,14 @@ CORS(app)
 arm = Blueprint('arm', __name__, url_prefix='/arm')
 
 # --- DATABASE CONNECTION ---
-DB_URI = "postgresql://postgres:postgres@192.168.1.66:5432/readiness_db"
+DB_URI = "postgresql://neondb_owner:npg_5wQeyoh4pxFT@ep-fragrant-dawn-at7nzvqv-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 engine = create_engine(DB_URI)
+
+@event.listens_for(engine, 'connect')
+def set_search_path(dbapi_conn, connection_record):
+    cursor = dbapi_conn.cursor()
+    cursor.execute("SET search_path TO readiness_db;")
+    cursor.close()
 
 def load_table(table_name):
     try:

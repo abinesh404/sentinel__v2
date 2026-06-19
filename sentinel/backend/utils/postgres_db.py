@@ -5,13 +5,15 @@ import traceback
 import psycopg2
 from psycopg2.extras import execute_values
 
-DB_URL = "postgresql://postgres:postgres@192.168.1.66:5432/sentinel_db"
+DB_URL = "postgresql://neondb_owner:npg_5wQeyoh4pxFT@ep-fragrant-dawn-at7nzvqv-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 def get_connection(retries=3, delay=2):
     """Establish a connection to PostgreSQL with retry logic."""
     for i in range(retries):
         try:
             conn = psycopg2.connect(DB_URL)
+            with conn.cursor() as cursor:
+                cursor.execute("SET search_path TO sentinel_db;")
             return conn
         except Exception as e:
             print(f"[PostgreSQL] Connection attempt {i+1} failed: {e}")
