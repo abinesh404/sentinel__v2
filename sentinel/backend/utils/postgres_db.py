@@ -43,7 +43,7 @@ def setup_table(cursor, table_name, create_query, required_columns):
     """
     # Check if table exists
     cursor.execute(
-        "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = %s)",
+        "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = %s)",
         (table_name,)
     )
     exists = cursor.fetchone()[0]
@@ -55,7 +55,7 @@ def setup_table(cursor, table_name, create_query, required_columns):
 
     # Check columns
     cursor.execute(
-        "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = %s",
+        "SELECT column_name FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = %s",
         (table_name,)
     )
     existing_cols = {r[0].lower() for r in cursor.fetchall()}
