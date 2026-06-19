@@ -666,6 +666,44 @@ def save_audit_session_data(tenant_id, filename, active_rcm_rows, audit_plan_row
                     plan_values
                 )
 
+                # Also insert into readiness_db for ARM
+                readiness_plan_values = []
+                for item in temp_plan_values:
+                    try:
+                        read_id = int(item["id"])
+                    except:
+                        read_id = abs(hash(str(item["id"]))) % (10**8)
+                    readiness_plan_values.append((
+                        item["company"],
+                        item["sector"],
+                        read_id,
+                        item["title"],
+                        item["risk_desc"],
+                        item["ctrl_desc"],
+                        item["audit_type"],
+                        item["risk_level"],
+                        item["department"],
+                        item["start_date"] or None,
+                        item["end_date"] or None,
+                        "Planning",
+                        "Audit Allocation",
+                        "Active",
+                        item["auditors"],
+                        1 # dummy user_id
+                    ))
+
+                execute_values(
+                    cursor,
+                    """
+                    INSERT INTO readiness_db.audit_plan (
+                        company, sector, id, title, "Risk description", control_description,
+                        audit_type, risk_level, department, start_date, end_date,
+                        current_phase, sub_stage, status, auditor, created_by_user_id
+                    ) VALUES %s
+                    """,
+                    readiness_plan_values
+                )
+
             # 4. Log Success
             log_to_db(cursor, "post_to_production", "post_success", "completed")
             

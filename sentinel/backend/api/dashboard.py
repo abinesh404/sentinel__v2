@@ -1142,6 +1142,22 @@ def post_to_production():
             "error": f"Failed to post to production database: {str(e)}"
         }), 500
 
+@dashboard_bp.route("/api/audit-names", methods=["GET"])
+def get_audit_names():
+    try:
+        from utils.postgres_db import get_connection
+        conn = get_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT DISTINCT audit_name FROM sentinel_db.audit_plan WHERE audit_name IS NOT NULL AND audit_name != ''")
+                names = [row[0] for row in cursor.fetchall()]
+            return jsonify({"success": True, "names": names})
+        finally:
+            conn.close()
+    except Exception as e:
+        print("Error fetching audit names:", e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 @dashboard_bp.route("/api/plants", methods=["GET"])
 def get_plants():

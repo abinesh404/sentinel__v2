@@ -94,6 +94,8 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
     };
   }, [plantDropdownOpen]);
 
+  const [auditNamesList, setAuditNamesList] = useState([]);
+
   useEffect(() => {
     fetch('/api/plants')
       .then(res => res.json())
@@ -101,6 +103,13 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
         if (Array.isArray(data)) setPlantsList(data);
       })
       .catch(err => console.error("Failed to load plants:", err));
+      
+    fetch('/api/audit-names')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.names)) setAuditNamesList(data.names);
+      })
+      .catch(err => console.error("Failed to load audit names:", err));
   }, []);
 
   // Close plant dropdown when clicking outside
@@ -1493,6 +1502,7 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
             </label>
             <input
               type="text"
+              list="audit-names-list"
               placeholder="e.g. Q3 Audit"
               value={globalFields.auditName || ''}
               onChange={(e) => {
@@ -1501,6 +1511,11 @@ const AuditPlanTable = ({ onKpiUpdate }) => {
               }}
               style={getDarkFieldStyle(validationErrors.auditName, { height: '38px', width: '100%', boxSizing: 'border-box' })}
             />
+            <datalist id="audit-names-list">
+              {auditNamesList.map(name => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
           </div>
 
           {/* Plant Multi-Select */}
