@@ -20,7 +20,7 @@ if os.path.exists(f1_csv):
     print(f"Reading {f1_csv}...")
     df1 = pd.read_csv(f1_csv)
     df1['Date of Creation'] = pd.to_datetime(df1['Date of Creation'], dayfirst=True, errors='coerce')
-    df1.to_sql('po_records', engine, if_exists='replace', index=False)
+    df1.to_sql('po_records', engine, if_exists='replace', index=False, schema='readiness_db')
     print("✅ LRS Data (po_records) imported successfully.")
 else:
     print(f"⚠️ Could not find {f1_csv}.")
@@ -31,12 +31,12 @@ f2_csv = 'Audit Plan.xlsx - Sheet1.csv'
 if os.path.exists(f2_xlsx):
     print(f"Reading {f2_xlsx}...")
     df2 = pd.read_excel(f2_xlsx)
-    df2.to_sql('audit_plan', engine, if_exists='replace', index=False)
+    df2.to_sql('audit_plan', engine, if_exists='replace', index=False, schema='readiness_db')
     print("✅ PRS Data (audit_plan) imported successfully.")
 elif os.path.exists(f2_csv):
     print(f"Reading {f2_csv}...")
     df2 = pd.read_csv(f2_csv)
-    df2.to_sql('audit_plan', engine, if_exists='replace', index=False)
+    df2.to_sql('audit_plan', engine, if_exists='replace', index=False, schema='readiness_db')
     print("✅ PRS Data (audit_plan) imported successfully.")
 else:
     print("⚠️ Could not find Audit Plan file.")
@@ -47,12 +47,12 @@ f3_csv = 'CompleteRcm_Manufacturing v1.xlsx - RCM_Manufacturing.csv'
 if os.path.exists(f3_xlsx):
     print(f"Reading {f3_xlsx}...")
     df3 = pd.read_excel(f3_xlsx)
-    df3.to_sql('rcm_config', engine, if_exists='replace', index=False)
+    df3.to_sql('rcm_config', engine, if_exists='replace', index=False, schema='readiness_db')
     print("✅ RCM Data (rcm_config) imported successfully.")
 elif os.path.exists(f3_csv):
     print(f"Reading {f3_csv}...")
     df3 = pd.read_csv(f3_csv)
-    df3.to_sql('rcm_config', engine, if_exists='replace', index=False)
+    df3.to_sql('rcm_config', engine, if_exists='replace', index=False, schema='readiness_db')
     print("✅ RCM Data (rcm_config) imported successfully.")
 else:
     print("⚠️ Could not find RCM Manufacturing file.")

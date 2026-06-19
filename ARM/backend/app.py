@@ -23,7 +23,7 @@ def set_search_path(dbapi_conn, connection_record):
 
 def load_table(table_name):
     try:
-        query = f'SELECT * FROM {table_name}'
+        query = f'SELECT * FROM readiness_db."{table_name}"'
         df = pd.read_sql(query, engine)
         return df.replace([np.nan, np.inf, -np.inf], None)
     except Exception as e:
