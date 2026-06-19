@@ -146,7 +146,7 @@ def build_ai_suggestions(df=None, col_map=None):
         from utils.postgres_db import get_connection
         conn = get_connection()
         try:
-            xls_df = pd.read_sql("SELECT * FROM ref_suggestions;", conn)
+            xls_df = pd.read_sql("SELECT * FROM sentinel_db.ref_suggestions;", conn)
         finally:
             conn.close()
     except Exception as e:

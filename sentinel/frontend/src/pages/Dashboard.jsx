@@ -194,9 +194,6 @@ const Dashboard = () => {
     
     if (isAiSuggestions) {
       allKeys = Array.from(dataKeys).filter(k => k !== 'ai_category' && k !== 'Cases');
-      if (dataKeys.has('Cases')) {
-        allKeys.push('Cases');
-      }
     } else {
       // Use original column order
       allKeys = columns.filter(col => dataKeys.has(col) && col !== 'ai_category');

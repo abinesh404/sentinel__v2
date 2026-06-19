@@ -129,7 +129,7 @@ def get_strategic_plan():
         from utils.postgres_db import get_connection
         conn = get_connection()
         try:
-            ref_df = pd.read_sql("SELECT * FROM ref_audit_plan;", conn)
+            ref_df = pd.read_sql("SELECT * FROM sentinel_db.ref_audit_plan;", conn)
         finally:
             conn.close()
 
@@ -474,7 +474,7 @@ def parse_auditor_master(file_path):
             from utils.postgres_db import get_connection
             conn = get_connection()
             try:
-                df = pd.read_sql("SELECT * FROM ref_auditors;", conn)
+                df = pd.read_sql("SELECT * FROM sentinel_db.ref_auditors;", conn)
             finally:
                 conn.close()
         except Exception as e:
@@ -1045,9 +1045,9 @@ def get_gap_analysis_benchmarks():
         import pandas as pd
         conn = get_connection()
         try:
-            df_global = pd.read_sql("SELECT * FROM ref_global_risk;", conn)
-            df_ind = pd.read_sql("SELECT * FROM ref_industry_risk;", conn)
-            df_fraud = pd.read_sql("SELECT * FROM ref_industry_fraud;", conn)
+            df_global = pd.read_sql("SELECT * FROM sentinel_db.ref_global_risk;", conn)
+            df_ind = pd.read_sql("SELECT * FROM sentinel_db.ref_industry_risk;", conn)
+            df_fraud = pd.read_sql("SELECT * FROM sentinel_db.ref_industry_fraud;", conn)
         finally:
             conn.close()
         
@@ -1150,7 +1150,7 @@ def get_plants():
         import pandas as pd
         conn = get_connection()
         try:
-            df = pd.read_sql("SELECT * FROM ref_plant;", conn)
+            df = pd.read_sql("SELECT * FROM sentinel_db.ref_plant;", conn)
         finally:
             conn.close()
 
